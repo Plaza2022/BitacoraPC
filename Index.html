@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitácora Plaza China</title>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<style>
+body{
+font-family:Arial;
+text-align:center;
+background:#eee;
+margin:0;
+}
+
+header{
+background:#f5a400;
+padding:15px;
+font-size:30px;
+font-weight:bold;
+color:white;
+}
+
+select,button{
+padding:12px;
+font-size:18px;
+margin:5px;
+}
+
+#reader{
+width:300px;
+margin:auto;
+}
+
+.evento{
+width:140px;
+background:#f5a400;
+border:none;
+border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>Bitácora</header>
+
+<br>
+
+<select id="empleado">
+<option>Guadalupe</option>
+<option>Cielo</option>
+<option>Claudia</option>
+<option>Carlos</option>
+<option>Yireth</option>
+<option>Marlen</option>
+<option>Herminia</option>
+<option>Zeus</option>
+<option>Yamileth</option>
+<option>Martha</option>
+</select>
+
+<br><br>
+
+<button onclick="iniciarQR()">
+Escanear QR
+</button>
+
+<div id="reader"></div>
+
+<h3 id="codigo"></h3>
+
+<br>
+
+<button class="evento" onclick="guardar('Entrada')">Entrada</button>
+<button class="evento" onclick="guardar('Comer')">Comer</button>
+
+<br>
+
+<button class="evento" onclick="guardar('Retorno')">Retorno</button>
+<button class="evento" onclick="guardar('Salida')">Salida</button>
+
+<script>
+
+let qrLeido="";
+
+function iniciarQR(){
+
+const html5QrCodeScanner = new Html5QrcodeScanner(
+"reader",
+{ fps:10, qrbox:250 }
+);
+
+html5QrCodeScanner.render(
+(texto)=>{
+
+qrLeido=texto;
+
+document.getElementById("codigo").innerHTML=
+"QR: "+texto;
+
+html5QrCodeScanner.clear();
+
+}
+);
+
+}
+
+async function guardar(evento){
+
+if(qrLeido==""){
+alert("Primero escanea un QR");
+return;
+}
+
+const empleado=
+document.getElementById("empleado").value;
+
+const url=
+"https://script.google.com/macros/s/AKfycbzTlksHS2L5to9ixT1Dto31x7mMLkVO1Ipeqx88V1rUkpdHdfIEG2e7n68mXxKp8KkA/exec"+
+"?tienda="+encodeURIComponent(qrLeido)+
+"&empleado="+encodeURIComponent(empleado)+
+"&evento="+encodeURIComponent(evento);
+
+await fetch(url);
+
+alert("Registro guardado");
+
+qrLeido="";
+document.getElementById("codigo").innerHTML="";
+}
+
+</script>
+
+</body>
+</html>
