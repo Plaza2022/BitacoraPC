@@ -6,7 +6,6 @@
 <title>Bitácora Plaza China</title>
 
 <link rel="icon" type="image/png" href="icono.png">
-    
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
@@ -42,6 +41,16 @@ background:#f5a400;
 border:none;
 border-radius:8px;
 }
+
+#adminBtn{
+display:block;
+margin:40px auto 20px auto;
+background:#555;
+color:white;
+border:none;
+border-radius:8px;
+padding:12px 20px;
+}
 </style>
 </head>
 
@@ -52,6 +61,8 @@ border-radius:8px;
 <header>Bitácora</header>
 
 <br>
+
+<div id="contenedorEmpleado">
 
 <select id="empleado">
 <option value="">Seleccione su nombre...</option>
@@ -67,6 +78,10 @@ border-radius:8px;
 <option>Martha</option>
 <option>Sr Israel</option>
 </select>
+
+<h3 id="empleadoTexto" style="display:none;"></h3>
+
+</div>
 
 <br><br>
 
@@ -88,22 +103,64 @@ Escanear QR
 <button class="evento" onclick="guardar('Retorno')">Retorno</button>
 <button class="evento" onclick="guardar('Salida')">Salida</button>
 
+<button id="adminBtn" onclick="abrirAdmin()">Administrador</button>
+
+<div id="adminPanel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,.3);z-index:9999;">
+
+<h3>Ingrese clave</h3>
+
+<div id="claveVisual" style="font-size:28px;letter-spacing:10px;margin-bottom:15px;height:35px;"></div>
+
+<div style="display:grid;grid-template-columns:repeat(3,70px);gap:8px;justify-content:center;">
+<button onclick="agregarNumero('1')">1</button>
+<button onclick="agregarNumero('2')">2</button>
+<button onclick="agregarNumero('3')">3</button>
+<button onclick="agregarNumero('4')">4</button>
+<button onclick="agregarNumero('5')">5</button>
+<button onclick="agregarNumero('6')">6</button>
+<button onclick="agregarNumero('7')">7</button>
+<button onclick="agregarNumero('8')">8</button>
+<button onclick="agregarNumero('9')">9</button>
+<button onclick="borrarNumero()">←</button>
+<button onclick="agregarNumero('0')">0</button>
+<button onclick="validarClave()">OK</button>
+</div>
+
+<br>
+<button onclick="cerrarAdmin()">Cancelar</button>
+</div>
+
 <script>
 
 let qrLeido = "";
+let claveIngresada = "";
 
-// Cargar empleado guardado al abrir la página
 window.onload = function() {
+
     const empleadoGuardado = localStorage.getItem("empleado");
 
     if (empleadoGuardado) {
-        document.getElementById("empleado").value = empleadoGuardado;
+        document.getElementById("empleado").style.display = "none";
+
+        const texto = document.getElementById("empleadoTexto");
+        texto.style.display = "block";
+        texto.innerHTML = "Empleado: <b>" + empleadoGuardado + "</b>";
     }
 };
 
-// Guardar empleado cuando se seleccione
 document.getElementById("empleado").addEventListener("change", function() {
+
+    if(this.value === "") return;
+
     localStorage.setItem("empleado", this.value);
+
+    alert("Se asignó el empleado correctamente");
+
+    this.style.display = "none";
+
+    const texto = document.getElementById("empleadoTexto");
+    texto.style.display = "block";
+    texto.innerHTML = "Empleado: <b>" + this.value + "</b>";
 });
 
 function iniciarQR(){
@@ -119,7 +176,7 @@ html5QrCodeScanner.render(
 qrLeido = texto;
 
 document.getElementById("codigo").innerHTML =
-"QR leído con correctamente !!!";
+"QR leído correctamente !!!";
 
 html5QrCodeScanner.clear();
 
@@ -136,6 +193,7 @@ return;
 }
 
 const empleado =
+localStorage.getItem("empleado") ||
 document.getElementById("empleado").value;
 
 if(empleado == ""){
@@ -155,6 +213,49 @@ alert("Registro guardado con éxito !");
 
 qrLeido = "";
 document.getElementById("codigo").innerHTML = "";
+
+}
+
+function abrirAdmin(){
+claveIngresada="";
+document.getElementById("claveVisual").innerHTML="";
+document.getElementById("adminPanel").style.display="block";
+}
+
+function cerrarAdmin(){
+document.getElementById("adminPanel").style.display="none";
+}
+
+function agregarNumero(num){
+if(claveIngresada.length>=4) return;
+claveIngresada += num;
+document.getElementById("claveVisual").innerHTML="*".repeat(claveIngresada.length);
+}
+
+function borrarNumero(){
+claveIngresada = claveIngresada.slice(0,-1);
+document.getElementById("claveVisual").innerHTML="*".repeat(claveIngresada.length);
+}
+
+function validarClave(){
+
+if(claveIngresada === "2126"){
+
+localStorage.removeItem("empleado");
+
+document.getElementById("empleado").value = "";
+document.getElementById("empleado").style.display = "inline-block";
+document.getElementById("empleadoTexto").style.display = "none";
+
+cerrarAdmin();
+
+alert("Modo administrador activado");
+
+}else{
+
+alert("Clave incorrecta");
+
+}
 
 }
 
