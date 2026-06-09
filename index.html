@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Bitácora Plaza China</title>
 
-<img src="logo.png" width="300">
-
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
@@ -47,11 +45,14 @@ border-radius:8px;
 
 <body>
 
+<img src="logo.png" width="300">
+
 <header>Bitácora</header>
 
 <br>
 
 <select id="empleado">
+<option value="">Seleccione su nombre...</option>
 <option>Guadalupe</option>
 <option>Cielo</option>
 <option>Claudia</option>
@@ -86,7 +87,21 @@ Escanear QR
 
 <script>
 
-let qrLeido="";
+let qrLeido = "";
+
+// Cargar empleado guardado al abrir la página
+window.onload = function() {
+    const empleadoGuardado = localStorage.getItem("empleado");
+
+    if (empleadoGuardado) {
+        document.getElementById("empleado").value = empleadoGuardado;
+    }
+};
+
+// Guardar empleado cuando se seleccione
+document.getElementById("empleado").addEventListener("change", function() {
+    localStorage.setItem("empleado", this.value);
+});
 
 function iniciarQR(){
 
@@ -98,10 +113,10 @@ const html5QrCodeScanner = new Html5QrcodeScanner(
 html5QrCodeScanner.render(
 (texto)=>{
 
-qrLeido=texto;
+qrLeido = texto;
 
-document.getElementById("codigo").innerHTML=
-"QR leído con éxito !!!";
+document.getElementById("codigo").innerHTML =
+"QR leído con correctamente !!!";
 
 html5QrCodeScanner.clear();
 
@@ -112,26 +127,32 @@ html5QrCodeScanner.clear();
 
 async function guardar(evento){
 
-if(qrLeido==""){
+if(qrLeido == ""){
 alert("Primero escanea un QR");
 return;
 }
 
-const empleado=
+const empleado =
 document.getElementById("empleado").value;
 
-const url=
-"https://script.google.com/macros/s/AKfycbzTlksHS2L5to9ixT1Dto31x7mMLkVO1Ipeqx88V1rUkpdHdfIEG2e7n68mXxKp8KkA/exec"+
-"?tienda="+encodeURIComponent(qrLeido)+
-"&empleado="+encodeURIComponent(empleado)+
-"&evento="+encodeURIComponent(evento);
+if(empleado == ""){
+alert("Seleccione su nombre");
+return;
+}
+
+const url =
+"https://script.google.com/macros/s/AKfycbzTlksHS2L5to9ixT1Dto31x7mMLkVO1Ipeqx88V1rUkpdHdfIEG2e7n68mXxKp8KkA/exec" +
+"?tienda=" + encodeURIComponent(qrLeido) +
+"&empleado=" + encodeURIComponent(empleado) +
+"&evento=" + encodeURIComponent(evento);
 
 await fetch(url);
 
-alert("Registro guardado");
+alert("Registro guardado con éxito !");
 
-qrLeido="";
-document.getElementById("codigo").innerHTML="";
+qrLeido = "";
+document.getElementById("codigo").innerHTML = "";
+
 }
 
 </script>
