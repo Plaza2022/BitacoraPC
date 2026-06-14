@@ -207,11 +207,11 @@ const url =
 "&empleado=" + encodeURIComponent(empleado) +
 "&evento=" + encodeURIComponent(evento);
 
-await fetch(url);
+const respuesta = await fetch(url); 
+const mensaje = await respuesta.text(); 
 
-alert("Registro guardado con éxito !");
-
-qrLeido = "";
+alert(mensaje); 
+qrLeido = ""; 
 document.getElementById("codigo").innerHTML = "";
 
 }
